@@ -1,0 +1,18 @@
+{
+  "name": "ykt-mongo",
+  "version": "0.1.0",
+  "description": "node mongo",
+  "author": {
+    "name": "BDK",
+    "email": "whoasbdk@126.com"
+  },
+  "main": "index.js",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^2.2.33"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zxy6173/ykt-mongo.git"
+  }
+}
