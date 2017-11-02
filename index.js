@@ -1,11 +1,12 @@
 'use strict';
-var MongoClient = require('mongodb').MongoClient;
-var ObjectID = require('mongodb').ObjectID;
-var DBRef = require('mongodb').DBRef;
-var config = require("../package.json");
-var url = config.db.url+"/"+config.db.dbname;
+const path = require("path");
+const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
+const DBRef = require('mongodb').DBRef;
+const config = require(path.resolve("package.json"));
+const url = config.db.url+"/"+config.db.dbname;
 
-var arySort = function(ary){
+const arySort = function(ary){
     ary.sort(function(a,b){
         if(a._id < b._id){
             return -1;
@@ -17,10 +18,11 @@ var arySort = function(ary){
 
     });
 }
-var dbCtrl = function(col, ctrl) {
+const dbCtrl = function(col, ctrl) {
     return function() {
         //将arguments转换为数组
         var arg = [].slice.apply(arguments);
+
         MongoClient.connect(url, function(err, db) {
             if (err) {
                 console.log("数据库连接出错：" + err);
@@ -43,8 +45,9 @@ var dbCtrl = function(col, ctrl) {
         });
     }
 }
-var dbQueryCtrl = function(col, ctrl) {
+const dbQueryCtrl = function(col, ctrl) {
     return function() {
+        console.log(url);
         var arg = [].slice.apply(arguments);
         MongoClient.connect(url, function(err, db) {
             if (err) {
@@ -69,7 +72,7 @@ var dbQueryCtrl = function(col, ctrl) {
         });
     }
 }
-var dbQueryPageCtrl = function(col, ctrl) {
+const dbQueryPageCtrl = function(col, ctrl) {
     return function() {
         var arg = [].slice.apply(arguments);
 
@@ -119,7 +122,7 @@ var dbQueryPageCtrl = function(col, ctrl) {
         });
     }
 }
-var dbRefQuery = function(data,col,func){
+const dbRefQuery = function(data,col,func){
 
         MongoClient.connect(url, function(err, db) {
             if (err) {
