@@ -3,7 +3,7 @@ const path = require("path");
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 const DBRef = require('mongodb').DBRef;
-const config = require(path.resolve("package.json"));
+const config = require(path.resolve(__dirname,"../../package.json"));
 const url = config.db.url+"/"+config.db.dbname;
 
 const arySort = function(ary){
