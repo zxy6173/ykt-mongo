@@ -1,12 +1,11 @@
 'use strict';
-const path = require("path");
-const MongoClient = require('mongodb').MongoClient;
-const ObjectID = require('mongodb').ObjectID;
-const DBRef = require('mongodb').DBRef;
-const config = require(path.resolve(__dirname,"../../package.json"));
-const url = config.db.url+"/"+config.db.dbname;
+var MongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
+var DBRef = require('mongodb').DBRef;
+var config = require("../package.json");
+var url = config.db.url+"/"+config.db.dbname;
 
-const arySort = function(ary){
+var arySort = function(ary){
     ary.sort(function(a,b){
         if(a._id < b._id){
             return -1;
@@ -18,17 +17,20 @@ const arySort = function(ary){
 
     });
 }
-const dbCtrl = function(col, ctrl) {
+var dbCtrl = function(col, ctrl) {
     return function() {
-        //将arguments转换为数组
-        var arg = [].slice.apply(arguments);
+        let args = arguments;
+        return new Promise(function(resolve,reject){
 
+        //将arguments转换为数组
+        var arg = [].slice.apply(args);
         MongoClient.connect(url, function(err, db) {
             if (err) {
                 console.log("数据库连接出错：" + err);
             } else {
                 var c = db.collection(col);
                 var func = arg[arg.length - 1];
+                
                 if (typeof(func) == "function") {
                     arg[arg.length - 1] = function(err, result) {
                         if (err) {
@@ -37,17 +39,28 @@ const dbCtrl = function(col, ctrl) {
                         func(result);
                         //关闭数据库连接
                         db.close();
+                        resolve();
                     }
+                }else{
+                    arg.push(function(err,result){
+                        if(err){
+                            console.log("数据操作失败：" + err);
+                            reject(err);
+                        }
+                        resolve(result);
+                        db.close();
+
+                    });
                 }
 
                 c[ctrl].apply(c, arg);
             }
         });
+    })
     }
 }
-const dbQueryCtrl = function(col, ctrl) {
+var dbQueryCtrl = function(col, ctrl) {
     return function() {
-        console.log(url);
         var arg = [].slice.apply(arguments);
         MongoClient.connect(url, function(err, db) {
             if (err) {
@@ -72,7 +85,7 @@ const dbQueryCtrl = function(col, ctrl) {
         });
     }
 }
-const dbQueryPageCtrl = function(col, ctrl) {
+var dbQueryPageCtrl = function(col, ctrl) {
     return function() {
         var arg = [].slice.apply(arguments);
 
@@ -122,8 +135,10 @@ const dbQueryPageCtrl = function(col, ctrl) {
         });
     }
 }
-const dbRefQuery = function(data,col,func){
+var dbRefQuery = function(data,col,func){
+    return new Promise(function(resolve,reject){
 
+    
         MongoClient.connect(url, function(err, db) {
             if (err) {
                 console.log("数据库连接出错：" + err);
@@ -132,6 +147,13 @@ const dbRefQuery = function(data,col,func){
                 if(data && data.length > 0 ){
                     data.forEach(function(ele){
                         if(ele[col] && ele[col]._bsontype == 'DBRef'){
+                            try{
+                                ObjectID(ele[col].oid);
+                            }catch(e){
+                                resolve(data);
+                                db.close();
+                                return;
+                            }
                             db.collection(col).find({_id:ObjectID(ele[col].oid)}).toArray(function(err,result){
                                     if(result && result.length > 0){
                                         ele[col] = result[0];
@@ -144,7 +166,8 @@ const dbRefQuery = function(data,col,func){
                                     if(newAry.length == data.length){
 
                                         arySort(newAry);
-                                        func(newAry);
+                                        // func(newAry);
+                                        resolve(newAry);
                                         db.close();
                                     }
                             })
@@ -155,20 +178,23 @@ const dbRefQuery = function(data,col,func){
 
                                 arySort(newAry);
 
-                                func(newAry);
+                                // func(newAry);
+                                resolve(newAry);
                                 db.close();
                             }
                         }
 
                     })
                 }else{
-                    func(data);
+                    // func(data);
+                    resolve(newAry);
                     db.close();
                 }
 
 
             }
         });
+    })
 
 }
 exports.collection = function(col) {
