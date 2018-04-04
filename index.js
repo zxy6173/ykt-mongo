@@ -2,7 +2,8 @@
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var DBRef = require('mongodb').DBRef;
-var config = require("../package.json");
+const path = require("path");
+const config = require(path.resolve("./package.json"));
 var url = config.db.url+"/"+config.db.dbname;
 
 var arySort = function(ary){
