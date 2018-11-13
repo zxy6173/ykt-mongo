@@ -9,7 +9,7 @@
     {
         ...
         "db":{
-            "url":"http://localhost:27017",
+            "url":"mongodb://localhost:27017",
             "dbname":"mydb"
         }
         ...
