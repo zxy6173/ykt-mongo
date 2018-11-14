@@ -101,10 +101,14 @@ var dbQueryPageCtrl = function(col, ctrl) {
                 //如果页码不存在，则默认为第1页
                 if(!curpage || isNaN(parseInt(curpage))){
                     curpage = 1;
+                }else{
+                    curpage = parseInt(curpage);
                 }
                 //如果每页显示数不存在则默认为每页显示5条数据
                 if(!eachpage || isNaN(parseInt(eachpage))){
                     eachpage = 5;
+                }else{
+                    eachpage = parseInt(eachpage);
                 }
                 var func = arg.pop();
 
