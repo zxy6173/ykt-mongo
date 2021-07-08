@@ -151,15 +151,16 @@ var dbRefQuery = function(data,col,func){
                 var newAry = [];
                 if(data && data.length > 0 ){
                     data.forEach(function(ele){
-                        if(ele[col] && ele[col]._bsontype == 'DBRef'){
+                        if(ele[col]){
+                            let refId = ele[col].oid || ele[col];
                             try{
-                                ObjectID(ele[col].oid);
+                                ObjectID(refId);
                             }catch(e){
                                 resolve(data);
                                 db.close();
                                 return;
                             }
-                            db.collection(col).find({_id:ObjectID(ele[col].oid)}).toArray(function(err,result){
+                            db.collection(col).find({_id:ObjectID(refId)}).toArray(function(err,result){
                                     if(result && result.length > 0){
                                         ele[col] = result[0];
                                     }else{
@@ -215,3 +216,5 @@ exports.collection = function(col) {
 }
 exports.ObjectID = ObjectID;
 exports.findJoin = dbRefQuery;
+
+
